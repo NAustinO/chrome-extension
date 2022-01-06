@@ -1,22 +1,19 @@
 const body = document.querySelector('body');
+// injectStyles();
+injectStylesheet();
+
+
 // contents.parentNode.removeChild(contents);
 // console.log('main.js is being executed ')
 // const contents = document.getElementById('contents')
 // contents.innerHTML = '<h1>THIS IS HERE BECAUSE MAIN.JS WORKS </h1>'
 // contents.parentNode.removeChild(contents);
 
-
-
-
-//create interface class
 class Interface {
   constructor(data) {
-    //store data retrieved from dictionary API
-    this.data = []; 
-    this.parse(data);
-    //creates popup window in browser
-    this.render();
-  
+    this.data = []; // internal data structure 
+    this.parse(data); // parses data received from dictionary API (data) and pushes to this.data 
+    this.render();  //creates popup window in browser
   }
 
   /**
@@ -25,7 +22,6 @@ class Interface {
    * @param {array} data array of objects containing the words from our api 
    */
   parse(data) {
-    
     // for each word object 
     data.forEach(wordObject => {
       // create a new simplified word object 
@@ -40,7 +36,6 @@ class Interface {
       // remove after debugging 
       console.log(simplifiedWord);
 
-  
       // push to this.data 
       this.data.push(simplifiedWord); // <== may need to reverse this.data before rendering to interface 
     })
@@ -51,16 +46,37 @@ class Interface {
     this.node.setAttribute('class', 'interface');
     body.appendChild(this.node);
 
-    //adding elements to node
-    //adding the selected word a
-    const selectedWord = document.createElement('h2');
-    selectedWord.setAttribute('id', 'selected-word');
-    this.node.appendChild(selectedWord);
-    document.querySelector('#selected-word').innerText = this.data[0].word;
-    
+    for (let i = 0; i < this.data.length; i++) {
+
+      //adding elements to node
+      //adding the selected word as h2
+      const selectedWord = document.createElement('h2');
+      selectedWord.setAttribute('class', 'selected-word');
+      selectedWord.innerText = this.data[i].word;
+      this.node.appendChild(selectedWord);
+
+      //adding the part of speech
+      const partOfSpeech = document.createElement('h3');
+      partOfSpeech.setAttribute('class', 'speech');
+      partOfSpeech.innerText = this.data[i].partOfSpeech;
+      this.node.appendChild(partOfSpeech);
+
+
+      //adding short definitions
+      const shortDefsArr = this.data[i].shortDefs;
+      const defsList = document.createElement('ul');
+      defsList.setAttribute('class', 'def-list');
+      this.node.appendChild(defsList);
+      shortDefsArr.forEach( el => {
+        const defsListItem = document.createElement('li');
+        defsListItem.setAttribute('class', 'def-list-item');
+        defsListItem.innerText = el;
+        defsList.appendChild(defsListItem);
+      })
   }
 
-
+  
+  }
 
   /**
    * This method extracts the shortdef property array from the wordObject and returns it 
@@ -86,10 +102,6 @@ class Interface {
     const synFilter = synArray.filter(el => el.length < 15);
     return synFilter;
   }
-
-
-  
-  
 
   /**
    * This method parses the wordObject of the string from the wordObject.meta.id property,
@@ -121,44 +133,23 @@ class Interface {
     })
     return output; 
   }  
-
-  /**
-   * This method injects the stylesheet 
-   */
-  injectStylesheet() {
-    const fileLocation = './style.css'
-    let htmlToInject = (`
-      <script type="text/javascript>
-        const file = ${fileLocation}
-      </script>
-    `)
-  }
-
 }
-
-
-
-
 
 // document.addEventListener('mousedown', (e) => {
 //   console.log('mouse clicked ')
 // })
 
-// window.addEventListener('DOMContentLoaded', (e) => {
-  
-
-
+// we may need to change remmove the event listener on each call and readd it at the end 
+// to prevent having the eventListener callback run too frequently 
 document.addEventListener('keydown', (e) => {
   // e is of KeyboardEvent class
   // console.log('in event listener ')
     // gets highlighted text 
-  const highlightedText = document.getSelection().toString();
-  // console.log(e.ctrlKey)
-  // console.log(typeof e.key);
-  // console.log(highlightedText);
   
-  // if keyboard event is not 'ctrl' + 1 or if no text is selected 
-  // <---------------------------------------------------------------------- FIX 
+  const highlightedText = document.getSelection().toString();
+  // console.log(e.ctrlKey // console.log(typeof e.key) // console.log(highlightedText);
+  
+  // if keyboard event is not 'ctrl' + 1 or if no text is selected, exit callback func 
   if (
     !(e.ctrlKey === true && e.key === '1') ||
     !highlightedText ||
@@ -167,8 +158,7 @@ document.addEventListener('keydown', (e) => {
     console.log('event listener was called, but exited since it wasnt the right key')
     return; 
   } 
-
-  // <---------------------------------------------------------------------- FIX 
+  
   console.log('event listener was called with right keys')
   
   // replaces spaces with '%20'  
@@ -176,18 +166,22 @@ document.addEventListener('keydown', (e) => {
   
   //test dictionary API
   fetch(`https://dictionaryapi.com/api/v3/references/collegiate/json/${highlightedText}?key=89e6d1b8-1e07-4b38-b36d-2ddd665e493c`)
-  .then((data) => data.json())
-  .then((data) => {
-
-    // create instance of Interface class
-    const interface = new Interface(data);
-    // interface.parse(data);
-    
-  
-    // console.log(data);
+    .then((data) => data.json())
+    .then((data) => {
+      // create instance of Interface class
+      const interface = new Interface(data);
   })
-
-  
 })
-// })
+
+
+/**
+ * Injects the local style.css file into our destination window 
+ */
+function injectStylesheet() {
+  const link = document.createElement('link');
+  link.href = './style.css';
+  link.type = 'text/css';
+  link.rel = 'stylesheet';
+  document.getElementsByTagName('head')[0].appendChild(link);
+}
 
