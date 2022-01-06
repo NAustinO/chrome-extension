@@ -1,5 +1,10 @@
 const body = document.querySelector('body');
-// injectStyles();
+
+const interfaceElement = document.createElement('div');
+interfaceElement.setAttribute('id', 'interface');
+
+body.appendChild(interfaceElement);
+
 injectStylesheet();
 
 
@@ -42,9 +47,12 @@ class Interface {
   }
 
   render() {
-    this.node = document.createElement('div');
-    this.node.setAttribute('class', 'interface');
-    body.appendChild(this.node);
+    this.resetStyling();
+
+    this.node = interfaceElement;
+    // this.node = document.createElement('div');
+    // this.node.setAttribute('class', 'interface');
+    // body.appendChild(this.node);
 
     for (let i = 0; i < this.data.length; i++) {
 
@@ -73,9 +81,23 @@ class Interface {
         defsListItem.innerText = el;
         defsList.appendChild(defsListItem);
       })
+   }
   }
 
-  
+
+
+  resetStyling() {
+    interfaceElement.innerHTML = '';
+    interfaceElement.style.visibility = 'visible';
+    interfaceElement.style.position = 'fixed';
+    interfaceElement.style.right = '0px';
+    interfaceElement.style.top = '0px';
+    interfaceElement.style.backgroundColor = 'whitesmoke';
+    interfaceElement.style.width = '300px';
+    interfaceElement.style.height = '500px';
+    interfaceElement.style.overflowY = 'scroll';
+    interfaceElement.style.zIndex = '100';
+    interfaceElement.style.padding = '50px'
   }
 
   /**
