@@ -1,28 +1,13 @@
 const body = document.querySelector('body');
 // contents.parentNode.removeChild(contents);
+// console.log('main.js is being executed ')
+// const contents = document.getElementById('contents')
+// contents.innerHTML = '<h1>THIS IS HERE BECAUSE MAIN.JS WORKS </h1>'
+// contents.parentNode.removeChild(contents);
 
 
 
-/*
-// word were looking up 
-// fl (adjecrtive, etc)
-// dt - an array containing text and verbal illustration (vis) of the definition
 
-
-class Word {
-  constructor() {
-    this.wordName;
-    this.shortDefs = [];
-    this.audioFile 
-    this.pronunciation; 
-  }
-}
-
-
-data = [
-  {}
-]
-*/
 //create interface class
 class Interface {
   constructor(data) {
@@ -30,9 +15,7 @@ class Interface {
     this.data = []; 
     this.parse(data);
     //creates popup window in browser
-    this.node = document.createElement('div');
-    this.node.setAttribute('class', 'interface');
-    body.appendChild(node);
+    this.render();
   
   }
 
@@ -48,11 +31,11 @@ class Interface {
       // create a new simplified word object 
       const simplifiedWord = {};
       // add our chosen data from api into our simplified word object 
-      simplifiedWord[word] = this.parseWord(wordObject);  // -> string 
-      simplifiedWord[shortDefs] = this.parseShortDefs(wordObject);  // -> array of strings 
-      simplifiedWord[partOfSpeech] = wordObject['fl'];  // -> string 
-      simplifiedWord[synonyms] = this.parseSynonyms(wordObject); // -> array of strings 
-      simplifiedWord[pronunciations] = this.parsePronunciations(wordObject);
+      simplifiedWord['word'] = this.parseWord(wordObject);  // -> string 
+      simplifiedWord['shortDefs'] = this.parseShortDefs(wordObject);  // -> array of strings 
+      simplifiedWord['partOfSpeech'] = wordObject['fl'];  // -> string 
+      simplifiedWord['synonyms'] = this.parseSynonyms(wordObject); // -> array of strings 
+      simplifiedWord['pronunciations'] = this.parsePronunciations(wordObject);
 
       // remove after debugging 
       console.log(simplifiedWord);
@@ -61,6 +44,20 @@ class Interface {
       // push to this.data 
       this.data.push(simplifiedWord); // <== may need to reverse this.data before rendering to interface 
     })
+  }
+
+  render() {
+    this.node = document.createElement('div');
+    this.node.setAttribute('class', 'interface');
+    body.appendChild(this.node);
+
+    //adding elements to node
+    //adding the selected word a
+    const selectedWord = document.createElement('h2');
+    selectedWord.setAttribute('id', 'selected-word');
+    this.node.appendChild(selectedWord);
+    document.querySelector('#selected-word').innerText = this.data[0].word;
+    
   }
 
 
@@ -76,15 +73,17 @@ class Interface {
     return shortdefArr;
   }
 
+
+  // TODO <------------------------------------------------- FIX 
   parseSynonyms(wordObject) {
     //traverse data structure
       //syns (array, length 1) -> object with keys 'pl' (string that says 'synonyms)
       // and pt (array)
     if (!wordObject.syns) return [];
-    const synString = wordObject.syns[0].pt[0][1];
+    let synString = wordObject.syns[0].pt[0][1];
     synString = synString.replace('{/sc}', '');
     const synArray = synString.split('{sc}');
-    synFilter = synArray.filter(el => el.length > 15);
+    const synFilter = synArray.filter(el => el.length < 15);
     return synFilter;
   }
 
@@ -107,6 +106,12 @@ class Interface {
     return wordString
   }
 
+  /**
+   * This method parses the wordObject of the pronunciations properties, 
+   * returning an array of strings 
+   * @param {object} wordObject 
+   * @returns an array containing all string pronunciations 
+   */
   parsePronunciations(wordObject) {
     const pronunciationsArr = wordObject.hwi.prs;
     if (!pronunciationsArr || pronunciationsArr.length === 0) return [];
@@ -117,34 +122,53 @@ class Interface {
     return output; 
   }  
 
+  /**
+   * This method injects the stylesheet 
+   */
+  injectStylesheet() {
+    const fileLocation = './style.css'
+    let htmlToInject = (`
+      <script type="text/javascript>
+        const file = ${fileLocation}
+      </script>
+    `)
+  }
+
 }
 
 
 
 
 
-document.addEventListener('mousedown', (e) => {
-  console.log('mouse clicked ')
-})
+// document.addEventListener('mousedown', (e) => {
+//   console.log('mouse clicked ')
+// })
 
-
+// window.addEventListener('DOMContentLoaded', (e) => {
+  
 
 
 document.addEventListener('keydown', (e) => {
   // e is of KeyboardEvent class
-  console.log('in event listener ')
+  // console.log('in event listener ')
     // gets highlighted text 
   const highlightedText = document.getSelection().toString();
+  // console.log(e.ctrlKey)
+  // console.log(typeof e.key);
+  // console.log(highlightedText);
   
   // if keyboard event is not 'ctrl' + 1 or if no text is selected 
+  // <---------------------------------------------------------------------- FIX 
   if (
-    !(e.ctrlKey === true && e.key === 1) ||
+    !(e.ctrlKey === true && e.key === '1') ||
     !highlightedText ||
     highlightedText === ''
   ) {
     console.log('event listener was called, but exited since it wasnt the right key')
     return; 
   } 
+
+  // <---------------------------------------------------------------------- FIX 
   console.log('event listener was called with right keys')
   
   // replaces spaces with '%20'  
@@ -159,18 +183,11 @@ document.addEventListener('keydown', (e) => {
     const interface = new Interface(data);
     // interface.parse(data);
     
-      // within instance 
-    console.log(data);
+  
+    // console.log(data);
   })
 
   
 })
+// })
 
-
-// //test dictionary API
-fetch('https://dictionaryapi.com/api/v3/references/collegiate/json/selection?key=89e6d1b8-1e07-4b38-b36d-2ddd665e493c')
-  .then((data) => data.json())
-  .then((data) => {
-    console.log(data);
-  })
-  

@@ -1,0 +1,7 @@
+.interface {
+  position: fixed;
+  right: 0;
+  top: 0;
+  background-color: whitesmoke;
+  width: 300px;
+}
