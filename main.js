@@ -16,9 +16,18 @@ injectStylesheet();
 
 class Interface {
   constructor(data) {
+    console.log(data)
     this.data = []; // internal data structure 
-    this.parse(data); // parses data received from dictionary API (data) and pushes to this.data 
-    this.render();  //creates popup window in browser
+    if (data.length === 0 || typeof data[0] !== 'object') {
+      this.render(true);
+      this.makeInvisible();
+      alert('No definition for this word(s)')
+      return;
+    }
+    else {
+      this.parse(data);
+      this.render()
+    }
   }
 
   /**
@@ -46,7 +55,12 @@ class Interface {
     })
   }
 
-  render() {
+  render(invisible = false) {
+    if (invisible === true) {
+      this.resetStyling();
+      return
+    }
+    // console.log(this.data)
     this.resetStyling();
 
     this.node = interfaceElement;
@@ -84,6 +98,10 @@ class Interface {
    }
   }
 
+  makeInvisible() {
+    interfaceElement.style.visibility = 'hidden'
+  }
+
 
 
   resetStyling() {
@@ -92,7 +110,7 @@ class Interface {
     interfaceElement.style.position = 'fixed';
     interfaceElement.style.right = '0px';
     interfaceElement.style.top = '0px';
-    interfaceElement.style.backgroundColor = 'whitesmoke';
+    interfaceElement.style.backgroundColor = 'rgba(245,245,245,.75)';
     interfaceElement.style.width = '300px';
     interfaceElement.style.height = '500px';
     interfaceElement.style.overflowY = 'scroll';
@@ -177,12 +195,13 @@ document.addEventListener('keydown', (e) => {
     !highlightedText ||
     highlightedText === ''
   ) {
+
     console.log('event listener was called, but exited since it wasnt the right key')
     return; 
   } 
   
   console.log('event listener was called with right keys')
-  
+  highlightedText.trim();
   // replaces spaces with '%20'  
   highlightedText.replace(' ', '%20');
   
