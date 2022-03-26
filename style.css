@@ -3,7 +3,7 @@
   position: fixed;
   right: 0;
   top: 0;
-  background-color: rgba(245, 245,245,.6);
+  background-color: rgba(245, 245,245);
   width: 300px;
   height: 500px;
   overflow-y: scroll;

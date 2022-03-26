@@ -4,24 +4,22 @@ const body = document.querySelector('body');
 const interfaceElement = document.createElement('div');
 interfaceElement.setAttribute('id', 'interface');
 
-
 body.appendChild(interfaceElement);
 
 injectStylesheet();
 
 class Interface {
   constructor(data) {
-    console.log(data)
     this.data = []; // internal data structure 
     if (data.length === 0 || typeof data[0] !== 'object') {
-      this.render(true);
+      this.render();
       this.makeInvisible();
       alert('No definition for this word(s)')
       return;
     }
     else {
       this.parse(data);
-      this.render(true);
+      this.render(false);
     }
   }
 
@@ -55,13 +53,13 @@ class Interface {
     this.resetStyling();
 
     this.node = interfaceElement;
+
     const xButton = document.createElement('button');
-    xButton.innerText('X');
+    xButton.innerText = 'X';
     xButton.addEventListener('click', (e) => {
-      this.render(false);
+      this.makeInvisible();
     })
     xButton.setAttribute('id', 'xButton');
-
     this.node.appendChild(xButton);
 
     for (let i = 0; i < this.data.length; i++) {
@@ -103,7 +101,7 @@ class Interface {
     interfaceElement.style.position = 'fixed';
     interfaceElement.style.right = '0px';
     interfaceElement.style.top = '0px';
-    interfaceElement.style.backgroundColor = 'rgba(245,245,245, .85)';
+    interfaceElement.style.backgroundColor = 'rgba(245,245,245, 1)';
     interfaceElement.style.width = '300px';
     interfaceElement.style.height = '500px';
     interfaceElement.style.overflowY = 'scroll';
