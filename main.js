@@ -21,7 +21,7 @@ class Interface {
     }
     else {
       this.parse(data);
-      this.render();
+      this.render(true);
     }
   }
 
