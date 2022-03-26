@@ -8,5 +8,9 @@
   height: 500px;
   overflow-y: scroll;
   visibility: hidden;
+}
 
+#xButton {
+  position: fixed; 
+  right: 0; 
 }

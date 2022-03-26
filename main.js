@@ -1,18 +1,13 @@
 const body = document.querySelector('body');
 
+// element that will hold all the text 
 const interfaceElement = document.createElement('div');
 interfaceElement.setAttribute('id', 'interface');
+
 
 body.appendChild(interfaceElement);
 
 injectStylesheet();
-
-
-// contents.parentNode.removeChild(contents);
-// console.log('main.js is being executed ')
-// const contents = document.getElementById('contents')
-// contents.innerHTML = '<h1>THIS IS HERE BECAUSE MAIN.JS WORKS </h1>'
-// contents.parentNode.removeChild(contents);
 
 class Interface {
   constructor(data) {
@@ -26,7 +21,7 @@ class Interface {
     }
     else {
       this.parse(data);
-      this.render()
+      this.render();
     }
   }
 
@@ -39,18 +34,14 @@ class Interface {
     // for each word object 
     data.forEach(wordObject => {
       // create a new simplified word object 
-      const simplifiedWord = {};
-      // add our chosen data from api into our simplified word object 
-      simplifiedWord['word'] = this.parseWord(wordObject);  // -> string 
-      simplifiedWord['shortDefs'] = this.parseShortDefs(wordObject);  // -> array of strings 
-      simplifiedWord['partOfSpeech'] = wordObject['fl'];  // -> string 
-      simplifiedWord['synonyms'] = this.parseSynonyms(wordObject); // -> array of strings 
-      simplifiedWord['pronunciations'] = this.parsePronunciations(wordObject);
+      const simplifiedWord = {
+        word:  this.parseWord(wordObject), 
+        shortDefs: this.parseShortDefs(wordObject),
+        partOfSpeech: wordObject['fl'],
+        synonyms: this.parseSynonyms(wordObject),
+        pronunciations: this.parsePronunciations(wordObject)
+      };
 
-      // remove after debugging 
-      console.log(simplifiedWord);
-
-      // push to this.data 
       this.data.push(simplifiedWord); // <== may need to reverse this.data before rendering to interface 
     })
   }
@@ -58,15 +49,20 @@ class Interface {
   render(invisible = false) {
     if (invisible === true) {
       this.resetStyling();
-      return
+      return;
     }
     // console.log(this.data)
     this.resetStyling();
 
     this.node = interfaceElement;
-    // this.node = document.createElement('div');
-    // this.node.setAttribute('class', 'interface');
-    // body.appendChild(this.node);
+    const xButton = document.createElement('button');
+    xButton.innerText('X');
+    xButton.addEventListener('click', (e) => {
+      this.render(false);
+    })
+    xButton.setAttribute('id', 'xButton');
+
+    this.node.appendChild(xButton);
 
     for (let i = 0; i < this.data.length; i++) {
 
@@ -82,7 +78,6 @@ class Interface {
       partOfSpeech.setAttribute('class', 'speech');
       partOfSpeech.innerText = this.data[i].partOfSpeech;
       this.node.appendChild(partOfSpeech);
-
 
       //adding short definitions
       const shortDefsArr = this.data[i].shortDefs;
@@ -102,15 +97,13 @@ class Interface {
     interfaceElement.style.visibility = 'hidden'
   }
 
-
-
   resetStyling() {
     interfaceElement.innerHTML = '';
     interfaceElement.style.visibility = 'visible';
     interfaceElement.style.position = 'fixed';
     interfaceElement.style.right = '0px';
     interfaceElement.style.top = '0px';
-    interfaceElement.style.backgroundColor = 'rgba(245,245,245,.75)';
+    interfaceElement.style.backgroundColor = 'rgba(245,245,245, .85)';
     interfaceElement.style.width = '300px';
     interfaceElement.style.height = '500px';
     interfaceElement.style.overflowY = 'scroll';
@@ -175,34 +168,20 @@ class Interface {
   }  
 }
 
-// document.addEventListener('mousedown', (e) => {
-//   console.log('mouse clicked ')
-// })
 
-// we may need to change remmove the event listener on each call and readd it at the end 
-// to prevent having the eventListener callback run too frequently 
 document.addEventListener('keydown', (e) => {
-  // e is of KeyboardEvent class
-  // console.log('in event listener ')
-    // gets highlighted text 
-  
+
   const highlightedText = document.getSelection().toString();
-  // console.log(e.ctrlKey // console.log(typeof e.key) // console.log(highlightedText);
   
   // if keyboard event is not 'ctrl' + 1 or if no text is selected, exit callback func 
   if (
     !(e.ctrlKey === true && e.key === '1') ||
     !highlightedText ||
     highlightedText === ''
-  ) {
-
-    console.log('event listener was called, but exited since it wasnt the right key')
-    return; 
-  } 
+  ) return; 
   
-  console.log('event listener was called with right keys')
+  // prepares the text for inserting into the query string 
   highlightedText.trim();
-  // replaces spaces with '%20'  
   highlightedText.replace(' ', '%20');
   
   //test dictionary API
